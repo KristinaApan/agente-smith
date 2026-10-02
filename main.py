@@ -1,3 +1,5 @@
+from faster_whisper import WhisperModel
+
 import base64
 
 import json
@@ -10,6 +12,13 @@ from openai import OpenAI
 client = OpenAI(
     base_url="http://localhost:1234/v1",
     api_key="lm-studio",
+)
+
+
+whisper_model = WhisperModel(
+    "small",
+    device="cpu",
+    compute_type="int8",
 )
 
 
@@ -74,7 +83,11 @@ def resolver_problema_png(ruta: str) -> str:
     return response.choices[0].message.content
 
 
-print(resolver_problema_png("problema.png"))
+
+def transcribir_audio(ruta: str) -> str:
+    segmentos, _ = whisper_model.transcribe(ruta)
+    return " ".join(segmento.text for segmento in segmentos)
+
 
 def menu() -> None:
     while True:
@@ -113,8 +126,11 @@ def menu() -> None:
             print(resultado)
 
         elif opcion == "4":
-            print("\nEsta opción estará disponible próximamente.")
-
+            ruta = input("\nIntroduce la ruta del archivo de audio: ")
+            resultado = transcribir_audio(ruta)
+            print("\nTranscripción:")
+            print(resultado)
+ 
         elif opcion == "5":
             print("\nSaliendo del asistente...")
             break
