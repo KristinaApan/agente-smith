@@ -1,3 +1,5 @@
+import base64
+
 import json
 
 import requests
@@ -28,7 +30,7 @@ def traducir(texto_json: str) -> str:
     )
 
     return response.choices[0].message.content
-    
+
 
 def descargar_imagen(url: str, ruta: str) -> None:
     response = requests.get(url, timeout=30)
@@ -39,6 +41,40 @@ def descargar_imagen(url: str, ruta: str) -> None:
 
     print(f"Imagen guardada en: {ruta}")
 
+
+def resolver_problema_png(ruta: str) -> str:
+    with open(ruta, "rb") as archivo:
+        imagen = base64.b64encode(archivo.read()).decode("utf-8")
+
+    response = client.chat.completions.create(
+        model="qwen3-vl-8b-instruct",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": (
+                            "Resuelve el problema matemático de esta imagen. "
+                            "Explica brevemente el procedimiento y proporciona "
+                            "el resultado final."
+                        ),
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/png;base64,{imagen}"
+                        },
+                    },
+                ],
+            }
+        ],
+    )
+
+    return response.choices[0].message.content
+
+
+print(resolver_problema_png("problema.png"))
 
 def menu() -> None:
     while True:
@@ -70,7 +106,11 @@ def menu() -> None:
             descargar_imagen(url, ruta)
 
         elif opcion == "3":
-            print("\nEsta opción estará disponible próximamente.")
+            ruta = input("\nIntroduce la ruta del archivo PNG: ")
+            resultado = resolver_problema_png(ruta)
+
+            print("\nResultado:")
+            print(resultado)
 
         elif opcion == "4":
             print("\nEsta opción estará disponible próximamente.")
@@ -81,6 +121,8 @@ def menu() -> None:
 
         else:
             print("\nOpción no válida.")
+
+
 
 
 if __name__ == "__main__":
