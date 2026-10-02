@@ -1,5 +1,7 @@
 import json
 
+import requests
+
 from openai import OpenAI
 
 
@@ -26,6 +28,16 @@ def traducir(texto_json: str) -> str:
     )
 
     return response.choices[0].message.content
+    
+
+def descargar_imagen(url: str, ruta: str) -> None:
+    response = requests.get(url, timeout=30)
+    response.raise_for_status()
+
+    with open(ruta, "wb") as archivo:
+        archivo.write(response.content)
+
+    print(f"Imagen guardada en: {ruta}")
 
 
 def menu() -> None:
@@ -52,7 +64,10 @@ def menu() -> None:
             print(resultado)
 
         elif opcion == "2":
-            print("\nEsta opción estará disponible próximamente.")
+            url = input("\nIntroduce la URL de la imagen: ")
+            ruta = input("Introduce la ruta donde quieres guardarla: ")
+
+            descargar_imagen(url, ruta)
 
         elif opcion == "3":
             print("\nEsta opción estará disponible próximamente.")
