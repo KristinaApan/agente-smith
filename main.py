@@ -1,13 +1,9 @@
-from faster_whisper import WhisperModel
-
 import base64
-
 import json
 
 import requests
-
+from faster_whisper import WhisperModel
 from openai import OpenAI
-
 
 client = OpenAI(
     base_url="http://localhost:1234/v1",
@@ -71,9 +67,7 @@ def resolver_problema_png(ruta: str) -> str:
                     },
                     {
                         "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/png;base64,{imagen}"
-                        },
+                        "image_url": {"url": f"data:image/png;base64,{imagen}"},
                     },
                 ],
             }
@@ -81,7 +75,6 @@ def resolver_problema_png(ruta: str) -> str:
     )
 
     return response.choices[0].message.content
-
 
 
 def transcribir_audio(ruta: str) -> str:
@@ -130,15 +123,13 @@ def menu() -> None:
             resultado = transcribir_audio(ruta)
             print("\nTranscripción:")
             print(resultado)
- 
+
         elif opcion == "5":
             print("\nSaliendo del asistente...")
             break
 
         else:
             print("\nOpción no válida.")
-
-
 
 
 if __name__ == "__main__":

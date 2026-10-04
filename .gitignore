@@ -8,3 +8,8 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Local audio and voice models
+*.wav
+*.onnx
+*.onnx.json

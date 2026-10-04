@@ -1,29 +1,30 @@
-import base64
+from functools import lru_cache
 from pathlib import Path
 
-import requests
+import pyttsx3
+import sounddevice as sd
+import soundfile as sf
 from faster_whisper import WhisperModel
-from openai import OpenAI
 
 
-MODEL = "qwen3-8b"
-VISION_MODEL = "qwen3-vl-8b-instruct"
-
-client = OpenAI(
-    base_url="http://localhost:1234/v1",
-    api_key="lm-studio",
-)
+AUDIO_FILE = Path("audio_temp.wav")
+SAMPLE_RATE = 16_000
+SILENCE_DURATION = 1.5
 
 
+@lru_cache(maxsize=1)
 def cargar_whisper() -> WhisperModel:
+    """Carga Whisper usando GPU y utiliza CPU como alternativa."""
     try:
+        print(" Cargando Whisper en GPU...")
         return WhisperModel(
             "small",
             device="cuda",
             compute_type="float16",
         )
-    except Exception:
-        print("CUDA no disponible. Usando CPU.")
+    except Exception as error:
+        print(f"No se ha podido usar CUDA: {error}")
+        print(" Cargando Whisper en CPU...")
         return WhisperModel(
             "small",
             device="cpu",
@@ -31,81 +32,71 @@ def cargar_whisper() -> WhisperModel:
         )
 
 
-whisper_model = cargar_whisper()
+def grabar_audio(
+    duracion: int = 6,
+    ruta: Path = AUDIO_FILE,
+) -> Path:
+    """Graba audio desde el micrófono."""
+    print("\n Habla ahora...")
 
-
-def traducir(texto: str, idioma_objetivo: str) -> str:
-    respuesta = client.chat.completions.create(
-        model=MODEL,
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "Eres un traductor. Traduce el texto al idioma indicado. "
-                    "Devuelve únicamente la traducción, sin explicaciones."
-                ),
-            },
-            {
-                "role": "user",
-                "content": (
-                    f"Idioma objetivo: {idioma_objetivo}\n"
-                    f"Texto: {texto}"
-                ),
-            },
-        ],
-        temperature=0.2,
+    audio = sd.rec(
+        int(duracion * SAMPLE_RATE),
+        samplerate=SAMPLE_RATE,
+        channels=1,
+        dtype="float32",
     )
 
-    return respuesta.choices[0].message.content.strip()
+    sd.wait()
+
+    sf.write(ruta, audio, SAMPLE_RATE)
+
+    print(" Grabación terminada.")
+
+    return ruta
 
 
-def descargar_imagen(url: str, ruta: str) -> None:
-    response = requests.get(url, timeout=30)
-    response.raise_for_status()
+def transcribir_audio(ruta: Path = AUDIO_FILE) -> str:
+    """Transcribe un archivo de audio con Whisper."""
+    print(" Transcribiendo...")
 
-    Path(ruta).write_bytes(response.content)
+    model = cargar_whisper()
 
-    print(f"Imagen guardada en: {ruta}")
-
-
-def resolver_problema_png(ruta: str) -> str:
-    imagen = Path(ruta).read_bytes()
-    imagen_base64 = base64.b64encode(imagen).decode("utf-8")
-
-    respuesta = client.chat.completions.create(
-        model=VISION_MODEL,
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": (
-                            "Resuelve el problema matemático de esta imagen. "
-                            "Explica brevemente el procedimiento y proporciona "
-                            "el resultado final."
-                        ),
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": (
-                                f"data:image/png;base64,{imagen_base64}"
-                            )
-                        },
-                    },
-                ],
-            }
-        ],
+    segmentos, _ = model.transcribe(
+        str(ruta),
+        beam_size=5,
     )
 
-    return respuesta.choices[0].message.content.strip()
-
-
-def transcribir_audio(ruta: str) -> str:
-    segmentos, _ = whisper_model.transcribe(ruta)
-
-    return " ".join(
+    texto = " ".join(
         segmento.text.strip()
         for segmento in segmentos
     )
+
+    print(f" Has dicho: {texto}")
+
+    return texto
+
+
+def hablar(texto: str) -> None:
+    """Reproduce una respuesta mediante síntesis de voz."""
+    if not texto:
+        return
+
+    engine = pyttsx3.init()
+    engine.setProperty("rate", 170)
+
+    engine.say(texto)
+    engine.runAndWait()
+
+
+def escuchar_y_transcribir(duracion: int = 6) -> str:
+    """Graba una orden y la convierte directamente a texto."""
+    ruta = grabar_audio(duracion)
+
+    return transcribir_audio(ruta)
+
+
+if __name__ == "__main__":
+    texto = escuchar_y_transcribir()
+
+    if texto:
+        hablar(f"Has dicho: {texto}")

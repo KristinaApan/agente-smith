@@ -2,7 +2,6 @@ import json
 
 from openai import OpenAI
 
-
 MODEL = "qwen3-8b"
 
 client = OpenAI(
@@ -22,6 +21,7 @@ Las acciones disponibles son:
 - descargar_imagen
 - resolver_imagen
 - transcribir_audio
+- conversar
 
 Debes responder ÚNICAMENTE con JSON válido.
 Nunca utilices Markdown.
@@ -53,6 +53,26 @@ resolver_imagen:
 
 transcribir_audio:
     ruta_audio
+
+conversar:
+    texto
+
+Si el usuario está saludando, haciendo una pregunta,
+hablando contigo o manteniendo una conversación y no solicita
+ninguna de las acciones anteriores, utiliza "conversar".
+
+Ejemplo:
+
+Usuario:
+"Hola, ¿eres el Agente Smith?"
+
+Respuesta:
+{
+    "accion": "conversar",
+    "parametros": {
+        "texto": "Hola, ¿eres el Agente Smith?"
+    }
+}
 """
 
 
