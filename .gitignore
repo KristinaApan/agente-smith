@@ -7,9 +7,6 @@ wheels/
 *.egg-info
 
 # Virtual environments
-.venv
+.venv/
 
-# Local audio and voice models
 *.wav
-*.onnx
-*.onnx.json

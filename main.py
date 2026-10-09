@@ -1,132 +1,56 @@
-import base64
-import json
-
-import requests
-from faster_whisper import WhisperModel
-from openai import OpenAI
-
-client = OpenAI(
-    base_url="http://localhost:1234/v1",
-    api_key="lm-studio",
-)
+from src.agente.asistente import ejecutar as ejecutar_voz
+from src.agente.interprete import reiniciar_historial, responder
+from src.agente.memoria import cargar_memoria
 
 
-whisper_model = WhisperModel(
-    "small",
-    device="cpu",
-    compute_type="int8",
-)
+def ejecutar_escrito() -> None:
+    """Ejecuta una conversación escrita con el Agente Smith."""
+    memoria = cargar_memoria()
+    reiniciar_historial()
 
+    print("\nAgente Smith activo.")
+    print("Escriba «adios» para volver al menú.\n")
 
-def traducir(texto_json: str) -> str:
-    datos = json.loads(texto_json)
+    while True:
+        texto = input("Tú: ").strip()
 
-    texto = datos["texto"]
-    idioma = datos["idioma"]
+        if not texto:
+            continue
 
-    response = client.chat.completions.create(
-        model="local-model",
-        messages=[
-            {
-                "role": "user",
-                "content": f"Traduce este texto al {idioma}:\n\n{texto}",
-            }
-        ],
-    )
+        if texto.casefold() in {"adios", "adiós"}:
+            print("Smith: Hasta pronto.")
+            return
 
-    return response.choices[0].message.content
+        respuesta = responder(
+            texto,
+            memoria,
+        )
 
-
-def descargar_imagen(url: str, ruta: str) -> None:
-    response = requests.get(url, timeout=30)
-    response.raise_for_status()
-
-    with open(ruta, "wb") as archivo:
-        archivo.write(response.content)
-
-    print(f"Imagen guardada en: {ruta}")
-
-
-def resolver_problema_png(ruta: str) -> str:
-    with open(ruta, "rb") as archivo:
-        imagen = base64.b64encode(archivo.read()).decode("utf-8")
-
-    response = client.chat.completions.create(
-        model="qwen3-vl-8b-instruct",
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": (
-                            "Resuelve el problema matemático de esta imagen. "
-                            "Explica brevemente el procedimiento y proporciona "
-                            "el resultado final."
-                        ),
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/png;base64,{imagen}"},
-                    },
-                ],
-            }
-        ],
-    )
-
-    return response.choices[0].message.content
-
-
-def transcribir_audio(ruta: str) -> str:
-    segmentos, _ = whisper_model.transcribe(ruta)
-    return " ".join(segmento.text for segmento in segmentos)
+        print(f"Smith: {respuesta}")
 
 
 def menu() -> None:
+    """Muestra el menú principal del Agente Smith."""
     while True:
-        print()
-        print("         ASISTENTE IA")
-        print()
-        print("1. Traducir texto")
-        print("2. Descargar imagen")
-        print("3. Resolver problema desde PNG")
-        print("4. Transcribir audio")
-        print("5. Salir")
+        print("\n" + "=" * 42)
+        print("              AGENTE SMITH")
+        print("=" * 42)
+        print("1. Interacción escrita")
+        print("2. Interacción por voz")
+        print("3. Salir")
+        print("=" * 42)
 
-        opcion = input("\nSelecciona una opción: ")
+        opcion = input("Selecciona una opción: ").strip()
 
         if opcion == "1":
-            entrada = input(
-                'Introduce el JSON (ejemplo: {"texto": "Hola", "idioma": "inglés"}):\n'
-            )
-
-            resultado = traducir(entrada)
-
-            print("\nTraducción:")
-            print(resultado)
+            ejecutar_escrito()
 
         elif opcion == "2":
-            url = input("\nIntroduce la URL de la imagen: ")
-            ruta = input("Introduce la ruta donde quieres guardarla: ")
-
-            descargar_imagen(url, ruta)
+            ejecutar_voz()
 
         elif opcion == "3":
-            ruta = input("\nIntroduce la ruta del archivo PNG: ")
-            resultado = resolver_problema_png(ruta)
-
-            print("\nResultado:")
-            print(resultado)
-
-        elif opcion == "4":
-            ruta = input("\nIntroduce la ruta del archivo de audio: ")
-            resultado = transcribir_audio(ruta)
-            print("\nTranscripción:")
-            print(resultado)
-
-        elif opcion == "5":
-            print("\nSaliendo del asistente...")
-            break
+            print("\nAgente Smith finalizado.")
+            return
 
         else:
             print("\nOpción no válida.")
