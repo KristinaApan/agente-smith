@@ -90,5 +90,3 @@ def obtener_recuerdos() -> list[str]:
 def limpiar_memoria() -> None:
     """Elimina todos los recuerdos persistentes."""
     guardar_memoria({"recuerdos": []})
-
-
