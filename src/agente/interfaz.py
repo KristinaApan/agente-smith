@@ -3,17 +3,16 @@ import queue
 import random
 import threading
 import tkinter as tk
+from tkinter.scrolledtext import ScrolledText
 
 import numpy as np
 import sounddevice as sd
 import soundfile as sf
-from tkinter.scrolledtext import ScrolledText
 
 from .config import FRECUENCIA_MUESTREO, RUTA_AUDIO_TEMPORAL
 from .interprete import reiniciar_historial, responder
 from .memoria import cargar_memoria
 from .voz import hablar, reconocer_audio
-
 
 ANCHO = 900
 ALTO = 560
@@ -470,7 +469,8 @@ class InterfazSmith:
             self.cola.put(
                 ("error", f"Error de grabación o procesamiento: {error}")
             )
-        except Exception as error:
+        # La interfaz debe comunicar también los errores inesperados.
+        except Exception as error:  # noqa: BLE001
             self.cola.put(("error", f"Error inesperado: {error}"))
         finally:
             self.cola.put(("estado", "listo"))
@@ -521,7 +521,8 @@ class InterfazSmith:
 
             self.cola.put(("mensaje", ("Smith", respuesta)))
 
-        except Exception as error:
+        # La interfaz debe comunicar también los errores inesperados.
+        except Exception as error:  # noqa: BLE001
             if not self.cerrando:
                 self.cola.put(
                     (
