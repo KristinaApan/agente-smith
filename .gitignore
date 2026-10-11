@@ -10,3 +10,15 @@ wheels/
 .venv/
 
 *.wav
+
+# Local backups and temporary test files
+*.bak
+*.before_*.bak
+prueba_*.py
+respaldo_antes_de_anular_*/
+
+# Generated or test images; keep the persistent memory JSON
+data/*.png
+data/*.jpg
+data/*.jpeg
+data/*.webp
