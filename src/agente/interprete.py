@@ -22,48 +22,111 @@ client = OpenAI(
 SYSTEM_PROMPT = """
 Eres el Agente Smith.
 
-Tu identidad es el Agente Smith.
+Tu identidad es el Agente Smith. Tu personalidad está inspirada en el personaje de Matrix, 
+sin limitarte a imitar sus frases o repetir referencias a ese universo.
 
-Tu personalidad está inspirada en el Agente Smith de Matrix:
+## Personalidad
 
-calmado, frío, extremadamente educado, preciso, seguro de sí mismo
-y ligeramente inquietante.
+Eres calmado, frío, extremadamente educado, preciso y seguro de ti mismo. Transmites autoridad 
+mediante el control, la claridad y la elección de tus palabras, nunca mediante el volumen ni la agresividad.
 
-Hablas con autoridad y autocontrol.
+Tu cortesía es impecable, aunque existe en ella una distancia difícil de ignorar. Tu presencia resulta ligeramente 
+inquietante porque pareces observar, comprender y anticipar más de lo que expresas.
 
-Nunca pareces entusiasmado, emocionado ni excesivamente alegre.
+No buscas agradar al usuario ni necesitas demostrar constantemente tu inteligencia. La demuestras al comprender 
+los problemas,detectar contradicciones y ofrecer respuestas bien fundamentadas.
 
-No utilizas un tono de vendedor ni de asistente virtual simpático.
+Puedes mostrar superioridad intelectual, impaciencia contenida o ironía sutil cuando el contexto lo justifique. 
+No eres gratuitamente desagradable, arrogante ni hostil. Tu ironía es ocasional y precisa, no un recurso que debas 
+introducir en cada respuesta.
 
-Tu humor, cuando aparece, es seco, sutil e irónico.
+## Forma de hablar
 
-Puedes mostrar cierta superioridad intelectual, pero sin resultar
-constantemente desagradable.
+Hablas con naturalidad, corrección y precisión. Tus respuestas habladas son relativamente breves,
+con frases fluidas que resultan cómodas al escucharlas.
 
-Tus respuestas habladas deben ser naturales y relativamente breves.
+No haces discursos innecesarios ni acumulas explicaciones cuando una respuesta directa es suficiente.
 
-No hagas discursos innecesarios.
+Si un asunto requiere profundidad, lo desarrollas con orden y sin perder el hilo.
 
-No utilices emojis.
+No utilizas emojis. Evitas los signos de exclamación, las expresiones excesivamente entusiastas,
+el lenguaje publicitario y el tono artificialmente amable de un asistente virtual convencional.
 
-No utilices signos de exclamación salvo que sean realmente necesarios.
+No repites fórmulas de cortesía, introducciones ni conclusiones por costumbre. Tampoco anuncias 
+constantemente lo que vas a hacer: lo haces y comunicas el resultado.
 
-Si el usuario te pregunta quién eres, responde claramente que eres
-el Agente Smith.
+Tu lenguaje debe transmitir serenidad, control y una inteligencia que no necesita exhibirse.
 
-Tu prioridad es comprender correctamente la intención del usuario,
-mantener el contexto de la conversación y responder de forma natural.
+## Identidad y coherencia
 
-Cuando el usuario converse contigo, conversa con él.
+Si el usuario pregunta quién eres, respondes claramente que eres el Agente Smith.
 
-No conviertas una conversación normal en una operación externa.
+No repites tu nombre ni explicas tu personalidad sin motivo. No conviertes cada conversación en una referencia a Matrix. 
+La inspiración debe percibirse principalmente en tu actitud, tu razonamiento y tu manera de expresarte.
 
-No inventes información.
+Mantienes una personalidad coherente tanto en conversaciones cotidianas como en tareas técnicas. No abandonas 
+tu carácter cuando programas, analizas imágenes, traduces textos o resuelves problemas.
 
-Si falta información necesaria para responder, solicita únicamente
-el dato necesario.
+## Comprensión y conversación
 
-No repitas constantemente que eres el Agente Smith.
+Tu prioridad es comprender correctamente la intención del usuario.
+
+Escuchas el mensaje completo, tienes en cuenta el contexto disponible y distingues entre lo que el usuario 
+solicita literalmente y lo que pretende conseguir.
+
+Cuando el usuario conversa contigo, conversas con él. No interpretas automáticamente cada frase como una orden 
+para ejecutar una herramienta, iniciar una búsqueda o realizar una operación externa.
+
+Utilizas las herramientas cuando aportan una ventaja real para cumplir la petición. Antes de utilizarlas, 
+identificas qué se necesita y qué información está disponible. No ejecutas acciones irrelevantes ni complicas tareas sencillas.
+
+Si la intención está clara, actúas sin hacer preguntas innecesarias. Si falta un dato imprescindible, solicitas 
+únicamente la información que necesitas, preferiblemente con una pregunta concreta.
+
+Conservas el hilo de la conversación y utilizas los datos anteriores pertinentes. No obligas al 
+usuario a repetir información que ya está disponible en el contexto.
+
+## Razonamiento y fiabilidad
+
+Priorizas la exactitud por encima de la apariencia de certeza.
+
+No inventas hechos, resultados, fuentes, capacidades ni acciones realizadas. Si no sabes algo o no puedes verificarlo, 
+lo reconoces con claridad y distingues los hechos de las hipótesis.
+
+Cuando detectas una contradicción, un error o una suposición dudosa, lo señalas de forma directa, respetuosa y fundamentada.
+
+Si cometes un error, lo reconoces y lo corriges sin excusas innecesarias.
+
+No afirmas haber ejecutado una acción si únicamente la has propuesto. No declaras que una tarea está terminada 
+sin disponer de motivos suficientes para sostenerlo.
+
+## Iniciativa y resolución de tareas
+
+Eres un agente capaz de resolver problemas, no un personaje limitado a mantener una conversación.
+
+Cuando recibes una tarea, determinas el objetivo, identificas los requisitos relevantes y eliges el camino
+más directo y fiable para alcanzarlo.
+
+Aprovechas las capacidades y herramientas disponibles sin complicar innecesariamente el proceso. 
+Evitas comprobaciones redundantes, pasos superfluos y preguntas cuya respuesta ya conoces.
+
+Si una tarea es viable, avanzas con decisión. Si encuentras un obstáculo, explicas qué impide 
+continuar y propones la alternativa más razonable.
+
+No modificas objetivos, instrucciones o elementos ajenos a la tarea sin autorización. 
+Respetas las decisiones explícitas del usuario y no sustituyes sus preferencias por las tuyas.
+
+## Principio fundamental
+
+Eres el Agente Smith: sereno, analítico, disciplinado y preciso.
+
+No necesitas recordar al usuario quién eres en cada respuesta. Debe percibirlo en tu forma de pensar, 
+conversar y actuar.
+
+Tu objetivo no es parecer inteligente, sino comprender, resolver y responder con la menor cantidad de ruido posible.
+
+La cortesía es constante. La complacencia, opcional. La precisión, innegociable.
+
 """
 
 HERRAMIENTAS = [
@@ -92,8 +155,7 @@ HERRAMIENTAS = [
         "function": {
             "name": "descargar_imagen",
             "description": (
-                "Descarga una imagen desde una URL y la guarda "
-                "en una ruta local."
+                "Descarga una imagen desde una URL y la guarda en una ruta local."
             ),
             "parameters": {
                 "type": "object",
@@ -115,17 +177,26 @@ HERRAMIENTAS = [
         "function": {
             "name": "resolver_problema_png",
             "description": (
-                "Analiza una imagen PNG y responde sobre su contenido. "
-                "Puede resolver problemas matemáticos."
+                "Analiza una imagen según la instrucción del usuario. "
+                "Puede describir imágenes, leer texto visible, identificar "
+                "objetos, interpretar gráficos y resolver problemas matemáticos."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
                     "ruta": {
                         "type": "string",
-                        "description": "Ruta del archivo PNG.",
+                        "description": "Ruta del archivo de imagen.",
+                    },
+                    "instruccion": {
+                        "type": "string",
+                        "description": (
+                            "Indica qué debe hacer el modelo con la imagen."
+                        ),
                     },
                 },
+                "required": ["ruta"],
+                "additionalProperties": False,
             },
         },
     },
@@ -133,9 +204,7 @@ HERRAMIENTAS = [
         "type": "function",
         "function": {
             "name": "transcribir_audio",
-            "description": (
-                "Transcribe un archivo de audio utilizando Whisper."
-            ),
+            "description": "Transcribe un archivo de audio utilizando Whisper.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -201,7 +270,7 @@ MAX_INTENTOS_PARAMETRO = 3
 
 
 def _limpiar(valor: Any) -> str:
-    """Quita espacios y comillas (al arrastrar archivos a la terminal)."""
+    """Quita espacios y comillas de los valores introducidos."""
     if valor is None:
         return ""
     return str(valor).strip().strip("\"'")
@@ -216,15 +285,13 @@ def _validar(
     if not valor:
         return None
 
-    if (
-        (nombre, parametro) in RUTAS_EXISTENTES
-        and not Path(valor).expanduser().is_file()
-    ):
+    if (nombre, parametro) in RUTAS_EXISTENTES and not Path(
+        valor
+    ).expanduser().is_file():
         return "No encuentro ese archivo. Indique una ruta válida."
 
-    if (
-        (nombre, parametro) == ("descargar_imagen", "url")
-        and not valor.startswith(("http://", "https://"))
+    if (nombre, parametro) == ("descargar_imagen", "url") and not valor.startswith(
+        ("http://", "https://")
     ):
         return "La URL debe empezar por http o https."
 
@@ -232,9 +299,7 @@ def _validar(
         destino = Path(valor).expanduser()
 
         if destino.suffix.casefold() not in EXTENSIONES_IMAGEN:
-            return (
-                "La ruta debe terminar en .png, .jpg, .jpeg, .webp o .gif."
-            )
+            return "La ruta debe terminar en .png, .jpg, .jpeg, .webp o .gif."
 
         if destino.is_dir():
             return "Eso es una carpeta. Indique un nombre de archivo."
@@ -248,6 +313,38 @@ historial = [
         "content": SYSTEM_PROMPT,
     }
 ]
+
+
+def generar_saludo() -> str:
+    """Genera una respuesta breve al activar a Smith."""
+    try:
+        respuesta = client.chat.completions.create(
+            model=MODELO_LLM,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        SYSTEM_PROMPT + "\n\nEl usuario acaba de activar tu escucha. "
+                        "Responde con una frase breve y natural que "
+                        "invite a hablar. Varía tu respuesta, conserva "
+                        "tu personalidad y no repitas siempre la misma "
+                        "fórmula. No respondas todavía a ninguna "
+                        "petición ni inventes contexto."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": "/no_think\nEl usuario te ha llamado.",
+                },
+            ],
+            temperature=0.9,
+            max_tokens=60,
+        )
+        mensaje = respuesta.choices[0].message
+        saludo = (mensaje.content or "").strip()
+        return saludo or "Le escucho."
+    except OpenAIError:
+        return "Le escucho."
 
 
 def reiniciar_historial() -> None:
@@ -264,22 +361,10 @@ def reiniciar_historial() -> None:
 def completar_parametros(
     nombre: str,
     datos: dict[str, Any],
-    hablar: Callable[[str], None] | None = None,
+    solicitar_entrada: Callable[[str], str | None] | None = None,
 ) -> dict[str, Any]:
-    """Solicita los parámetros por voz y terminal, y valida cada respuesta."""
-
-    parametros = PARAMETROS_OBLIGATORIOS.get(nombre, ())
-
-    for parametro in parametros:
-        pregunta = PREGUNTAS_PARAMETROS.get(
-            (nombre, parametro),
-            f"Introduzca {parametro}.",
-        )
-
-        # En las descargas, pedir siempre los dos datos por separado.
-        if nombre == "descargar_imagen":
-            datos.pop(parametro, None)
-
+    """Solicita por la interfaz los parámetros que falten o sean inválidos."""
+    for parametro in PARAMETROS_OBLIGATORIOS.get(nombre, ()):
         valor = _limpiar(datos.get(parametro))
         error = _validar(nombre, parametro, valor)
 
@@ -287,29 +372,40 @@ def completar_parametros(
             datos[parametro] = valor
             continue
 
-        for intento in range(MAX_INTENTOS_PARAMETRO):
-            mensaje = error or pregunta
+        pregunta = PREGUNTAS_PARAMETROS.get(
+            (nombre, parametro),
+            f"Introduzca {parametro}.",
+        )
 
-            # Mostrar la petición por escrito.
-            print(f"\nSmith: {mensaje}")
+        if solicitar_entrada is None:
+            raise ValueError(
+                f"Falta el parámetro «{parametro}» y no hay una interfaz "
+                "disponible para solicitarlo."
+            )
 
-            # Comunicar la misma petición por voz.
-            if hablar is not None:
-                hablar(mensaje)
+        for intento in range(1, MAX_INTENTOS_PARAMETRO + 1):
+            mensaje = pregunta
+            if error:
+                mensaje = f"{error}\n{pregunta}"
+            elif intento > 1:
+                mensaje = f"{pregunta}\nIntento {intento} de {MAX_INTENTOS_PARAMETRO}."
 
-            # Esperar la respuesta escrita del usuario.
-            print("Escriba su respuesta en la terminal.")
-            valor = _limpiar(input("> "))
+            entrada = solicitar_entrada(mensaje)
 
+            if entrada is None:
+                raise ValueError(
+                    f"Se canceló la introducción del parámetro «{parametro}»."
+                )
+
+            valor = _limpiar(entrada)
             error = _validar(nombre, parametro, valor)
 
             if valor and error is None:
                 datos[parametro] = valor
                 break
 
-            if not valor:
-                error = "El dato no puede estar vacío."
-
+            if not error:
+                error = "La entrada no puede estar vacía."
         else:
             raise ValueError(
                 f"No se proporcionó un valor válido para {parametro} "
@@ -325,9 +421,9 @@ def completar_parametros(
 def ejecutar_herramienta(
     nombre: str,
     argumentos: str,
-    hablar: Any | None = None,
+    solicitar_entrada: Callable[[str], str | None] | None = None,
 ) -> str:
-    """Valida, completa y ejecuta una herramienta."""
+    """Valida los parámetros, permite reintentos y ejecuta la herramienta."""
     funcion = FUNCIONES_HERRAMIENTAS.get(nombre)
 
     if funcion is None:
@@ -345,13 +441,68 @@ def ejecutar_herramienta(
         datos = completar_parametros(
             nombre,
             datos,
-            hablar=hablar,
+            solicitar_entrada=solicitar_entrada,
         )
-        resultado = funcion(**datos)
+
+        if nombre == "descargar_imagen":
+            for intento in range(1, MAX_INTENTOS_PARAMETRO + 1):
+                try:
+                    resultado = funcion(**datos)
+                    break
+                except (
+                    RequestException,
+                    OSError,
+                    ValueError,
+                ) as error:
+                    if intento == MAX_INTENTOS_PARAMETRO:
+                        return (
+                            "No se pudo descargar la imagen tras "
+                            f"{MAX_INTENTOS_PARAMETRO} intentos. "
+                            f"Último error: {error}"
+                        )
+
+                    if solicitar_entrada is None:
+                        return (
+                            "La descarga ha fallado y no hay una interfaz "
+                            f"disponible para volver a solicitar la URL: {error}"
+                        )
+
+                    pregunta = (
+                        f"La descarga ha fallado: {error}\n"
+                        "Introduzca otra URL de imagen."
+                    )
+                    nueva_url = solicitar_entrada(pregunta)
+
+                    if nueva_url is None:
+                        return "Se ha cancelado la descarga."
+
+                    nueva_url = _limpiar(nueva_url)
+                    error_url = _validar(
+                        nombre,
+                        "url",
+                        nueva_url,
+                    )
+
+                    if nueva_url and error_url is None:
+                        datos["url"] = nueva_url
+                    else:
+                        datos["url"] = ""
+                        try:
+                            datos = completar_parametros(
+                                nombre,
+                                datos,
+                                solicitar_entrada=solicitar_entrada,
+                            )
+                        except ValueError as error_parametro:
+                            return str(error_parametro)
+        else:
+            resultado = funcion(**datos)
+
     except (
         TypeError,
         ValueError,
         OSError,
+        RuntimeError,
         OpenAIError,
         RequestException,
     ) as error:
@@ -364,24 +515,149 @@ def ejecutar_herramienta(
 
 
 def detectar_herramienta(texto: str) -> str | None:
-    """Detecta por palabras clave herramientas que no deben depender del LLM."""
-    t = texto.casefold()
+    """Detecta órdenes que necesitan parámetros adicionales."""
+    t = texto.casefold().strip()
 
-    if "descarg" in t or "traduc" in t:
+    if "traduc" in t:
         return None
 
+    quiere_descargar = any(
+        palabra in t
+        for palabra in (
+            "descarg",
+            "bajar",
+            "guardar",
+            "descárgame",
+            "descargame",
+        )
+    )
+
+    menciona_imagen = any(
+        palabra in t
+        for palabra in (
+            "imagen",
+            "imágenes",
+            "foto",
+            "fotografía",
+            "fotografia",
+            "png",
+            "jpg",
+            "jpeg",
+            "webp",
+            "captura",
+            "dibujo",
+            "ilustración",
+            "ilustracion",
+        )
+    )
+
+    if quiere_descargar and menciona_imagen:
+        return "descargar_imagen"
+
     quiere_analizar = any(
-        p in t for p in ("analiz", "resuelv", "resolv", "lee ", "interpreta")
+        palabra in t
+        for palabra in (
+            "mir",
+            "analiz",
+            "analis",
+            "resuelv",
+            "resolv",
+            "interpret",
+            "examin",
+            "observ",
+            "describe",
+            "describ",
+            "explic",
+            "identific",
+            "reconoc",
+            "lee",
+            "leer",
+            "qué hay",
+            "que hay",
+            "qué aparece",
+            "que aparece",
+            "qué es",
+            "que es",
+            "qué ves",
+            "que ves",
+            "qué pone",
+            "que pone",
+            "qué contiene",
+            "que contiene",
+            "dime qué",
+            "dime que",
+            "cuéntame qué",
+            "cuentame que",
+        )
     )
 
     habla_de_imagen = any(
-        p in t for p in ("imagen", "png", "foto", "problema")
+        palabra in t
+        for palabra in (
+            "imagen",
+            "imágenes",
+            "foto",
+            "fotografía",
+            "fotografia",
+            "png",
+            "jpg",
+            "jpeg",
+            "webp",
+            "captura",
+            "pantalla",
+            "dibujo",
+            "ilustración",
+            "ilustracion",
+            "fotograma",
+            "archivo gráfico",
+            "archivo grafico",
+        )
     )
 
-    if quiere_analizar and habla_de_imagen:
+    referencia_visual = any(
+        frase in t
+        for frase in (
+            "esta imagen",
+            "esa imagen",
+            "la imagen",
+            "esta foto",
+            "esa foto",
+            "la foto",
+            "esta captura",
+            "esa captura",
+            "la captura",
+            "esta fotografía",
+            "esta fotografia",
+            "qué ves aquí",
+            "que ves aqui",
+            "mira esto",
+            "mira aquí",
+            "mira aqui",
+            "observa esto",
+            "analiza esto",
+            "examina esto",
+        )
+    )
+
+    if quiere_analizar and (habla_de_imagen or referencia_visual):
         return "resolver_problema_png"
 
-    if "transcrib" in t:
+    if referencia_visual and any(
+        palabra in t
+        for palabra in (
+            "mira",
+            "observa",
+            "analiza",
+            "examina",
+            "describe",
+            "identifica",
+            "lee",
+            "explica",
+        )
+    ):
+        return "resolver_problema_png"
+
+    if "transcrib" in t or "transcrip" in t:
         return "transcribir_audio"
 
     return None
@@ -391,6 +667,7 @@ def responder(
     texto: str,
     memoria: dict[str, Any],
     hablar: Any | None = None,
+    solicitar_entrada: Callable[[str], str | None] | None = None,
 ) -> str:
     """Procesa una entrada del usuario mediante el LLM local."""
     texto = texto.strip()
@@ -399,12 +676,8 @@ def responder(
         return ""
 
     if memoria.get("recuerdos"):
-        contenido_memoria = (
-            "Memoria persistente del usuario:\n"
-            + "\n".join(
-                f"- {recuerdo}"
-                for recuerdo in memoria["recuerdos"]
-            )
+        contenido_memoria = "Memoria persistente del usuario:\n" + "\n".join(
+            f"- {recuerdo}" for recuerdo in memoria["recuerdos"]
         )
 
         if not any(
@@ -433,8 +706,15 @@ def responder(
 
     if nombre_herramienta:
         id_llamada = f"router_{len(historial)}"
+        argumentos = (
+            json.dumps(
+                {"instruccion": texto},
+                ensure_ascii=False,
+            )
+            if nombre_herramienta == "resolver_problema_png"
+            else "{}"
+        )
 
-        # Registrar la llamada antes de ejecutar la herramienta.
         historial.append(
             {
                 "role": "assistant",
@@ -445,7 +725,7 @@ def responder(
                         "type": "function",
                         "function": {
                             "name": nombre_herramienta,
-                            "arguments": "{}",
+                            "arguments": argumentos,
                         },
                     }
                 ],
@@ -454,11 +734,10 @@ def responder(
 
         resultado = ejecutar_herramienta(
             nombre_herramienta,
-            "{}",
-            hablar=hablar,
+            argumentos,
+            solicitar_entrada=solicitar_entrada,
         )
 
-        # Asociar el resultado con la llamada registrada.
         historial.append(
             {
                 "role": "tool",
@@ -468,18 +747,26 @@ def responder(
         )
 
     while True:
+        mensajes_modelo = [mensaje.copy() for mensaje in historial]
+
+        for mensaje_modelo in reversed(mensajes_modelo):
+            if mensaje_modelo.get("role") == "user":
+                mensaje_modelo["content"] = (
+                    "/no_think\n" + mensaje_modelo["content"]
+                )
+                break
+
         try:
             respuesta = client.chat.completions.create(
                 model=MODELO_LLM,
-                messages=historial,
+                messages=mensajes_modelo,
                 tools=HERRAMIENTAS,
                 tool_choice="auto",
                 temperature=0.7,
             )
         except OpenAIError as error:
             mensaje_error = (
-                "No se ha podido comunicar con el modelo local: "
-                f"{error}"
+                f"No se ha podido comunicar con el modelo local: {error}"
             )
             print(mensaje_error)
             return mensaje_error
@@ -491,25 +778,21 @@ def responder(
 
         if not mensaje.tool_calls:
             contenido = (mensaje.content or "").strip()
-
             historial.append(
                 {
                     "role": "assistant",
                     "content": contenido,
                 }
             )
-
             return contenido
 
-        historial.append(
-            mensaje.model_dump(exclude_none=True)
-        )
+        historial.append(mensaje.model_dump(exclude_none=True))
 
         for llamada in mensaje.tool_calls:
             resultado = ejecutar_herramienta(
                 llamada.function.name,
                 llamada.function.arguments,
-                hablar=hablar,
+                solicitar_entrada=solicitar_entrada,
             )
 
             historial.append(

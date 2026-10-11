@@ -1,10 +1,8 @@
 import base64
-from io import BytesIO
 from pathlib import Path
 
 import requests
 from openai import OpenAI
-from PIL import Image, UnidentifiedImageError
 
 from .voz import reconocer_audio
 
@@ -31,10 +29,7 @@ def traducir(texto: str, idioma_objetivo: str) -> str:
             },
             {
                 "role": "user",
-                "content": (
-                    f"Idioma objetivo: {idioma_objetivo}\n"
-                    f"Texto: {texto}"
-                ),
+                "content": (f"Idioma objetivo: {idioma_objetivo}\nTexto: {texto}"),
             },
         ],
         temperature=0.2,
@@ -43,59 +38,52 @@ def traducir(texto: str, idioma_objetivo: str) -> str:
     return respuesta.choices[0].message.content.strip()
 
 
-def _validar_imagen(contenido: bytes, formato: str | None = None) -> str:
-    """Verifica que los bytes contengan una imagen válida."""
-    try:
-        with Image.open(BytesIO(contenido)) as imagen:
-            formato_real = imagen.format
-            if formato is not None and formato_real != formato:
-                raise ValueError(
-                    f"Formato no válido: se esperaba {formato}, "
-                    f"pero se recibió {formato_real or 'desconocido'}."
-                )
-            imagen.verify()
-
-        # verify() comprueba la estructura; load() comprueba la decodificación.
-        with Image.open(BytesIO(contenido)) as imagen:
-            imagen.load()
-
-    except (UnidentifiedImageError, OSError, SyntaxError) as error:
-        raise ValueError(
-            "El contenido recibido no es una imagen válida o está dañado."
-        ) from error
-
-    if formato_real is None:
-        raise ValueError("No se pudo determinar el formato de la imagen.")
-
-    return formato_real
-
-
-def descargar_imagen(url: str, ruta: str) -> None:
-    """Descarga y valida una imagen antes de guardarla."""
+def descargar_imagen(url: str, ruta: str) -> str:
+    """Descarga una imagen desde una URL."""
     response = requests.get(url, timeout=30)
     response.raise_for_status()
-
-    contenido = response.content
-    formato = _validar_imagen(contenido)
-
+    
     destino = Path(ruta)
     destino.parent.mkdir(parents=True, exist_ok=True)
-    temporal = destino.with_name(f".{destino.name}.part")
+    destino.write_bytes(response.content)
+
+    mensaje = f"Imagen guardada correctamente en: {destino}"
+    print(mensaje)
+    return mensaje
+
+
+def resolver_problema_png(
+    ruta: str,
+    instruccion: str = "Describe el contenido de esta imagen.",
+) -> str:
+    """Analiza una imagen según la instrucción recibida."""
+
+    from io import BytesIO
+
+    from PIL import Image, ImageOps
+
+    archivo = Path(ruta)
+
+    if not archivo.is_file():
+        raise ValueError(f"No encuentro el archivo: {archivo}")
 
     try:
-        temporal.write_bytes(contenido)
-        temporal.replace(destino)
-    finally:
-        temporal.unlink(missing_ok=True)
+        with Image.open(archivo) as imagen:
+            imagen.seek(0)
+            imagen = ImageOps.exif_transpose(imagen)
+            imagen.load()
 
-    print(f"Imagen guardada en: {destino} (formato: {formato})")
+            # Convertir a un formato compatible con el envío al modelo.
+            if imagen.mode not in ("RGB", "RGBA"):
+                imagen = imagen.convert("RGB")
 
+            buffer = BytesIO()
+            imagen.save(buffer, format="PNG")
 
-def resolver_problema_png(ruta: str) -> str:
-    """Resuelve un problema matemático contenido en un PNG real."""
-    imagen = Path(ruta).read_bytes()
-    _validar_imagen(imagen, formato="PNG")
-    imagen_base64 = base64.b64encode(imagen).decode("utf-8")
+            imagen_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    except (OSError, ValueError) as error:
+        raise ValueError(f"No se puede abrir la imagen {archivo}: {error}") from error
 
     respuesta = client.chat.completions.create(
         model=VISION_MODEL,
@@ -105,18 +93,12 @@ def resolver_problema_png(ruta: str) -> str:
                 "content": [
                     {
                         "type": "text",
-                        "text": (
-                            "Resuelve el problema matemático de esta imagen. "
-                            "Explica brevemente el procedimiento y proporciona "
-                            "el resultado final."
-                        ),
+                        "text": instruccion,
                     },
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": (
-                                f"data:image/png;base64,{imagen_base64}"
-                            )
+                            "url": (f"data:image/png;base64,{imagen_base64}")
                         },
                     },
                 ],
@@ -124,7 +106,7 @@ def resolver_problema_png(ruta: str) -> str:
         ],
     )
 
-    return respuesta.choices[0].message.content.strip()
+    return (respuesta.choices[0].message.content or "").strip()
 
 
 def transcribir_audio(ruta: str) -> str:

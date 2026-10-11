@@ -34,11 +34,7 @@ def configurar_cuda_dll() -> None:
 
     raiz_nvidia = Path(next(iter(spec.submodule_search_locations)))
 
-    rutas_cuda = [
-        ruta
-        for ruta in raiz_nvidia.glob("*/bin")
-        if ruta.is_dir()
-    ]
+    rutas_cuda = [ruta for ruta in raiz_nvidia.glob("*/bin") if ruta.is_dir()]
 
     for ruta in rutas_cuda:
         os.add_dll_directory(str(ruta))
@@ -56,23 +52,39 @@ configurar_cuda_dll()
 
 @lru_cache(maxsize=1)
 def cargar_whisper() -> WhisperModel:
-    """Carga Whisper en la GPU."""
+    """Carga Whisper en la GPU y conserva el modelo en caché."""
+    if not torch.cuda.is_available():
+        raise RuntimeError(
+            "CUDA no está disponible. Whisper necesita la GPU."
+        )
+
     print("Cargando Whisper en GPU...")
 
-    return WhisperModel(
-        MODELO_WHISPER,
-        device="cuda",
-        compute_type="float16",
-    )
+    try:
+        return WhisperModel(
+            MODELO_WHISPER,
+            device="cuda",
+            compute_type="float16",
+        )
+    except (OSError, RuntimeError, ValueError) as error:
+        raise RuntimeError(
+            f"No se pudo cargar Whisper en CUDA: {error}"
+        ) from error
 
 
 def reconocer_audio(ruta: str | Path) -> str:
-    """Transcribe un archivo de audio con el Whisper compartido."""
-    model = cargar_whisper()
+    """Transcribe un archivo de audio con Whisper en GPU."""
+    archivo = Path(ruta).expanduser()
+
+    if not archivo.is_file():
+        raise FileNotFoundError(
+            f"No existe el archivo de audio: {archivo}"
+        )
 
     try:
+        model = cargar_whisper()
         segmentos, _ = model.transcribe(
-            str(ruta),
+            str(archivo),
             language="es",
             beam_size=5,
             vad_filter=True,
@@ -92,9 +104,11 @@ def reconocer_audio(ruta: str | Path) -> str:
 
         return " ".join(textos)
 
-    except (OSError, RuntimeError) as error:
+    except (OSError, RuntimeError, ValueError) as error:
         print(f"Error al transcribir el audio: {error}")
         return ""
+
+
 
 @lru_cache(maxsize=1)
 def cargar_tts() -> Qwen3TTSModel:
@@ -109,21 +123,29 @@ def cargar_tts() -> Qwen3TTSModel:
 
 
 def liberar_whisper() -> None:
-    """Libera Whisper de la GPU."""
+    """Libera Whisper de la GPU y limpia la memoria disponible."""
     cargar_whisper.cache_clear()
     gc.collect()
 
     if torch.cuda.is_available():
-        torch.cuda.empty_cache()
+        try:
+            torch.cuda.empty_cache()
+        except RuntimeError as error:
+            print(f"Error al liberar la memoria de Whisper: {error}")
 
 
 def liberar_tts() -> None:
-    """Libera Qwen3-TTS de la GPU."""
+    """Libera Qwen3-TTS de la GPU y limpia la memoria disponible."""
     cargar_tts.cache_clear()
     gc.collect()
 
     if torch.cuda.is_available():
-        torch.cuda.empty_cache()
+        try:
+            torch.cuda.empty_cache()
+        except RuntimeError as error:
+            print(
+                f"Error al liberar la memoria de Qwen3-TTS: {error}"
+            )
 
 
 def grabar_audio(
@@ -166,13 +188,7 @@ def grabar_audio(
                     dtype=np.float32,
                 )
 
-                rms = float(
-                    np.sqrt(
-                        np.mean(
-                            np.square(audio)
-                        )
-                    )
-                )
+                rms = float(np.sqrt(np.mean(np.square(audio))))
 
                 if not hablando:
                     buffer_preroll.append(audio)
@@ -259,8 +275,6 @@ def transcribir_audio(
     return texto_final
 
 
-
-
 def escuchar_y_transcribir(timeout: float = 3.0) -> str:
     """Graba una frase y la transcribe.
 
@@ -276,13 +290,12 @@ def escuchar_y_transcribir(timeout: float = 3.0) -> str:
 
     return transcribir_audio(ruta)
 
+
 def _normalizar_texto(texto: str) -> str:
     """Normaliza mayúsculas, acentos y espacios para comparar órdenes."""
     texto = unicodedata.normalize("NFKD", texto.casefold())
     texto = "".join(
-        caracter
-        for caracter in texto
-        if not unicodedata.combining(caracter)
+        caracter for caracter in texto if not unicodedata.combining(caracter)
     )
     return re.sub(r"[^a-z0-9]+", " ", texto).strip()
 
@@ -328,20 +341,22 @@ def hablar(
     texto: str,
     idioma: str = "Spanish",
 ) -> None:
-    """Genera y reproduce una respuesta con la voz de Smith."""
-    if not texto:
+    """Genera y reproduce una respuesta con la voz de Smith en GPU."""
+    if not texto or not texto.strip():
         return
 
-    if not RUTA_REFERENCIA_VOZ.exists():
+    if not RUTA_REFERENCIA_VOZ.is_file():
         raise FileNotFoundError(
             f"No existe la referencia de voz: {RUTA_REFERENCIA_VOZ}"
         )
 
-    liberar_whisper()
-
-    model = cargar_tts()
+    model = None
 
     try:
+        # Libera Whisper antes de cargar Qwen3-TTS.
+        liberar_whisper()
+        model = cargar_tts()
+
         wavs, frecuencia = model.generate_voice_clone(
             text=texto,
             language=idioma,
@@ -350,22 +365,30 @@ def hablar(
             max_new_tokens=4096,
         )
 
-        datos = wavs[0]
+        if not wavs or wavs[0] is None:
+            raise RuntimeError("Qwen3-TTS no ha generado audio.")
 
-        sd.play(
-            datos,
-            frecuencia,
+        datos = np.asarray(wavs[0]).squeeze()
+
+        if datos.size == 0:
+            raise RuntimeError("El audio generado está vacío.")
+
+        silencio = np.zeros(
+            round(frecuencia * 0.5),
+            dtype=datos.dtype,
         )
+        datos = np.concatenate((datos, silencio))
 
+        sd.play(datos, frecuencia)
         sd.wait()
 
-    except (RuntimeError, OSError) as error:
-        print(
-            "Error al generar o reproducir la voz: "
-            f"{error}"
-        )
+    except (RuntimeError, OSError, ValueError) as error:
+        print(f"Error al generar o reproducir la voz: {error}")
 
     finally:
-        del model
-        liberar_tts()
+        sd.stop()
 
+        if model is not None:
+            del model
+
+        liberar_tts()

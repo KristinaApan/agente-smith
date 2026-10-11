@@ -1,4 +1,4 @@
-from .interprete import reiniciar_historial, responder
+from .interprete import generar_saludo, reiniciar_historial, responder
 from .memoria import cargar_memoria
 from .voz import (
     es_parada,
@@ -29,7 +29,7 @@ def ejecutar() -> None:
         if not esperar_activacion():
             continue
 
-        hablar("Dígame.")
+        hablar(generar_saludo())
 
         # Primera petición: sin límite estricto.
         texto = _escuchar(None)
