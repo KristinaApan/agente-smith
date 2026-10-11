@@ -22,3 +22,8 @@ data/*.png
 data/*.jpg
 data/*.jpeg
 data/*.webp
+
+# Datos personales y archivos antiguos conservados solo en local
+data/memoria/memoria.json
+/src/agente/agente.py
+/src/agente/wake_word.py
