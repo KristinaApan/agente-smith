@@ -1,115 +1,31 @@
 # Agente Smith
 
-## Descripción
+Agente Smith es un asistente personal de inteligencia artificial desarrollado en Python que combina conversación inteligente, interacción por voz, memoria persistente y una interfaz gráfica propia. Está diseñado para interpretar instrucciones, utilizar herramientas y facilitar tareas desde el ordenador, con especial atención al procesamiento local y la privacidad.
 
-Agente Smith es un asistente personal de inteligencia artificial desarrollado en Python que reúne conversación inteligente, interacción por voz, memoria persistente y una interfaz gráfica propia. Está diseñado para interpretar instrucciones, utilizar herramientas y facilitar tareas desde el ordenador, con especial atención al procesamiento local y la privacidad.
+Python constituye la base del proyecto, cuya arquitectura modular permite desarrollar y mantener sus diferentes componentes de forma independiente. LM Studio proporciona el entorno para ejecutar modelos de lenguaje localmente. Smith utiliza Qwen3-8B para interpretar peticiones, generar respuestas y decidir cuándo recurrir a sus herramientas, mientras que Qwen3-VL-8B Instruct permite trabajar con capacidades de análisis visual.
 
-## Arquitectura y tecnologías
+Faster-Whisper se encarga del reconocimiento del habla y Qwen3-TTS genera respuestas habladas utilizando una referencia de voz personalizada. PyTorch y CUDA permiten aprovechar la GPU NVIDIA para acelerar los componentes compatibles. JSON se utiliza para gestionar datos y conservar la memoria entre sesiones, mientras que uv facilita la gestión del entorno y las dependencias y Git permite controlar las versiones del proyecto.
 
-**Python** es la base del proyecto, cuya estructura modular permite desarrollar y mantener sus componentes de forma independiente.
+Smith dispone de una interfaz gráfica propia desde la que se puede interactuar con el asistente mediante texto y voz. Puede mantener conversaciones, interpretar instrucciones, utilizar herramientas para realizar tareas concretas, traducir textos, descargar imágenes desde una URL y transcribir archivos de audio. También incorpora memoria persistente para conservar información relevante entre sesiones y contempla el análisis de imágenes mediante modelos multimodales.
 
-**LM Studio** proporciona el entorno para ejecutar modelos de lenguaje localmente. Smith utiliza **Qwen3-8B** para interpretar peticiones, generar respuestas y decidir cuándo recurrir a sus herramientas. **Qwen3-VL-8B Instruct** está destinado al análisis de imágenes y a la ampliación de sus capacidades visuales.
+El proyecto está desarrollado con Python y utiliza tecnologías como LM Studio, Qwen3-8B, Qwen3-VL-8B Instruct, OpenAI Python Client, Faster-Whisper, Qwen3-TTS, PyTorch, CUDA, JSON, uv y Git.
 
-**Faster-Whisper** se encarga del reconocimiento del habla, mientras que **Qwen3-TTS** genera las respuestas habladas a partir de una referencia de voz personalizada.
+Para ejecutar Agente Smith es necesario disponer de una versión compatible de Python, instalar uv, sincronizar las dependencias del proyecto y configurar LM Studio con los modelos necesarios. La comunicación con los modelos se realiza a través del servidor local compatible con la API de OpenAI, disponible en `http://localhost:1234/v1`, lo que permite trabajar con los modelos configurados sin depender de una API de pago externa.
 
-**PyTorch y CUDA** permiten acelerar mediante la GPU NVIDIA los componentes compatibles. **JSON** facilita la gestión de datos y la memoria persistente, mientras que **uv** y **Git** ayudan a mantener un entorno de desarrollo organizado y un control de versiones adecuado.
-
-## Funcionalidades
-
-**Conversación inteligente.** Interpreta instrucciones mediante un modelo de lenguaje local y puede recurrir a herramientas para realizar tareas concretas.
-
-**Interfaz gráfica propia.** Permite interactuar con Smith desde un entorno visual diseñado para facilitar su uso.
-
-**Interacción por voz.** Reconoce instrucciones habladas y genera respuestas sonoras utilizando una voz personalizada.
-
-**Memoria persistente.** Conserva información relevante entre sesiones para mantener el contexto de las conversaciones.
-
-**Traducción de textos.** Traduce contenido al idioma solicitado mediante una herramienta basada en datos estructurados en JSON.
-
-**Gestión de imágenes y audio.** Permite descargar imágenes desde una URL y transcribir archivos de audio a texto.
-
-**Análisis visual.** El proyecto contempla el uso de modelos multimodales para interpretar imágenes y abordar problemas a partir de su contenido.
-
-## Tecnologías utilizadas
-
-* Python
-* uv
-* LM Studio
-* Qwen3-8B
-* Qwen3-VL-8B Instruct
-* OpenAI Python Client
-* Faster-Whisper
-* Qwen3-TTS
-* PyTorch y CUDA
-* JSON
-* Git
-
-## Requisitos
-
-* Python en una versión compatible con el proyecto.
-* uv para gestionar el entorno virtual y las dependencias.
-* LM Studio para ejecutar los modelos de lenguaje localmente.
-* Los modelos necesarios descargados y disponibles en LM Studio.
-* Una GPU NVIDIA compatible con CUDA para acelerar los componentes que lo admiten.
-
-## Instalación
-
-Clona el repositorio y accede a la carpeta del proyecto:
+Para instalar el proyecto, clona el repositorio desde GitHub y accede a su directorio con los siguientes comandos:
 
 ```bash
 git clone https://github.com/KristinaApan/agente-smith.git
 cd agente-smith
-```
-
-Instala las dependencias:
-
-```bash
 uv sync
 ```
 
-## Ejecución
-
-Inicia el asistente desde la raíz del proyecto:
+Una vez instaladas las dependencias y configurado LM Studio, inicia el asistente desde la carpeta raíz del proyecto:
 
 ```bash
 uv run main.py
 ```
 
+Agente Smith es un proyecto en evolución cuya arquitectura modular permite incorporar nuevas herramientas, integrar modelos y ampliar sus capacidades progresivamente. El desarrollo se centra en mejorar la comunicación entre sus componentes, perfeccionar la interfaz gráfica y seguir ampliando sus posibilidades de interacción y asistencia.
 
-Instala las dependencias definidas en el proyecto:
-
-```bash
-uv sync
-```
-
-`uv sync` crea o actualiza el entorno virtual y sincroniza las dependencias declaradas en `pyproject.toml` con el archivo de bloqueo del proyecto, si está disponible.
-
-## Configuración de LM Studio
-
-Inicia LM Studio, descarga los modelos necesarios y arranca el servidor local compatible con la API de OpenAI.
-
-La dirección utilizada por el proyecto es:
-
-```text
-http://localhost:1234/v1
-```
-
-El cliente de Python se comunica con este servidor local, por lo que las peticiones a los modelos configurados no necesitan utilizar una API de pago externa.
-
-## Ejecución
-
-Desde la carpeta raíz del proyecto, inicia Smith con:
-
-```bash
-uv run main.py
-```
-
-Si el proyecto utiliza un archivo de entrada diferente, ejecuta el punto de entrada correspondiente.
-
-## Un proyecto en evolución
-
-Agente Smith continúa creciendo con una arquitectura modular que facilita la incorporación de nuevas herramientas y modelos. El desarrollo se centra en mejorar la integración entre sus componentes, perfeccionar la interfaz y ampliar sus capacidades de interacción y asistencia.
-
-La meta es construir un asistente personal cada vez más completo y adaptable, capaz de comprender instrucciones, conservar información útil y ayudar con tareas desde un entorno propio.
-
-**Smith tiene una base sobre la que seguir construyendo: lo que puede hacer hoy es solo el comienzo de lo que podrá llegar a hacer.**
+La meta es construir un asistente personal cada vez más completo y adaptable, capaz de comprender instrucciones, conservar información útil y ayudar con distintas tareas desde su propio entorno. Smith cuenta con una base funcional sobre la que seguir creciendo, y sus posibilidades futuras dependerán de las nuevas herramientas y capacidades que se integren en el proyecto.
